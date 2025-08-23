@@ -1,0 +1,100 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project & Co. - Pioneering Web 4.0 Innovation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16">
+        <div class="container mx-auto text-center">
+            <h1 class="text-5xl font-bold mb-4">Project & Co.</h1>
+            <p class="text-xl">Transforming Data into Dynamic Content with Web 4.0 Innovation</p>
+        </div>
+    </header>
+
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-semibold mb-6">Who We Are</h2>
+            <p class="text-lg max-w-3xl mx-auto">
+                Project & Co. is a cutting-edge data science and tech analysis laboratory, pushing the boundaries of Web 4.0 contrivance engineering. We specialize in automation, media generation, and distribution, turning raw data into impactful, intelligent content.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-semibold text-center mb-12">What We Do</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <h3 class="text-xl font-bold mb-4">Data Science & Analysis</h3>
+                    <p>We harness advanced data science techniques to uncover insights and drive innovation, transforming complex datasets into actionable strategies.</p>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-xl font-bold mb-4">Web 4.0 Engineering</h3>
+                    <p>Our expertise in Web 4.0 technologies enables seamless automation and intelligent systems, redefining how content is created and shared.</p>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-xl font-bold mb-4">Media Generation & Distribution</h3>
+                    <p>We craft compelling media from data-driven insights, ensuring efficient and targeted distribution across modern platforms.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-blue-600 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-semibold mb-6">Our Mission</h2>
+            <p class="text-lg max-w-3xl mx-auto">
+                At Project & Co., we believe valuable data deserves to become valuable content. Our mission is to pioneer the future of digital innovation by blending data science with Web 4.0 technologies, creating meaningful and scalable solutions.
+            </p>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2025 Project & Co. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
